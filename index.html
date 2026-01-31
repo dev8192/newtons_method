@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .widget {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: fit-content;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+        input {
+            width: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="widget">
+        <div class="controls">
+            <div>
+                <label>Number:</label>
+                <input type="number" class="target_number">
+            </div>
+            <div>
+                <label>Guess:</label>
+                <input type="number" class="guess">
+            </div>
+            <div>
+                <label>Iterations:</label>
+                <input type="number" class="iterations">
+            </div>
+        </div>
+        <button class="visualize">Visualize</button>
+        <div class="output_container"></div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
