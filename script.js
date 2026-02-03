@@ -3,49 +3,79 @@ const guessInput = document.querySelector('.guess')
 const iterationsInput = document.querySelector('.iterations')
 const visualizeButton = document.querySelector('.visualize')
 const outputContainer = document.querySelector('.output_container')
-outputContainer.style.display = 'flex'
-outputContainer.style.flexDirection = 'column'
-outputContainer.style.gap = '10px'
-outputContainer.style.fontFamily = 'sans-serif'
 
-function createRow(i, target, guess, result) {
-    const rowContainer = document.createElement('div')
-    rowContainer.style.display = 'flex'
-    rowContainer.style.gap = '10px'
-    rowContainer.style.alignItems = 'center'
-    outputContainer.append(rowContainer)
+function doAppend(parentElem, item) {
+    if (typeof item === 'string') {
+        const elem = document.createElement('div')
+        elem.textContent = item
+        parentElem.append(elem)
+    } else {
+        parentElem.append(item)
+    }
+}
 
-    const iterNum = document.createElement('div')
-    iterNum.textContent = `(${i})`
-    rowContainer.append(iterNum)
+function handleArray(parentElem, arg) {
+    if (Array.isArray(arg)) {
+        for (const item of arg){
+            doAppend(parentElem, item)
+        }
+    } else {
+        doAppend(parentElem, arg)
+    }
+}
 
-    const outerFraction = document.createElement('div')
-    outerFraction.style.display = 'flex'
-    outerFraction.style.flexDirection = 'column'
-    outerFraction.style.alignItems = 'center'
-    rowContainer.append(outerFraction)
+function createGroup(arr) {
+    const rowElem = document.createElement('div')
+    rowElem.classList.add('row')
+    handleArray(rowElem, arr)
+    return rowElem
+}
 
-    const formulaTop = document.createElement('div')
-    formulaTop.textContent = `${guess} + ${target} / ${guess}`
-    outerFraction.append(formulaTop)
+function createFraction(top, bottom) {
+    const container = document.createElement('div')
+    container.classList.add('fraction')
+
+    container.append(createGroup(top))
 
     const separator = document.createElement('div')
-    separator.style.height = '1px'
-    separator.style.width = '100%'
-    separator.style.backgroundColor = 'black'
-    outerFraction.append(separator)
+    separator.classList.add('separator')
+    container.append(separator)
 
-    const formulaBottom = document.createElement('div')
-    formulaBottom.textContent = 2
-    outerFraction.append(formulaBottom)
+    container.append(createGroup(bottom))
 
-    const equalsElem = document.createElement('div')
-    equalsElem.textContent = '='
-    rowContainer.append(equalsElem)
+    return container 
+}
 
-    const resultElem = document.createElement('div')
-    resultElem.textContent = result
-    rowContainer.append(resultElem)
+function addRow(i, targetNum, guessNum, resultNum) {
+    const targetStr = String(targetNum)
+    const guessStr = String(guessNum)
+    const resultStr = String(resultNum)
+
+    const iterNum = document.createElement('div')
+    iterNum.classList.add('iter_num')
+    iterNum.textContent = `(${i})`
+
+    const group2 = createGroup([
+        '=',
+        createFraction([guessStr, '+', targetStr/guessStr], '2'),
+        '=',
+        createFraction(guessNum + (targetNum/guessNum), '2'),
+        '=',
+        resultStr,
+    ])
+
+    const group1 = createGroup([
+        iterNum,
+        createFraction(
+            [guessStr, '+', createFraction(targetStr, guessStr)],
+            '2'
+        ),
+        group2
+    ])
+    group1.style.alignItems = 'end'
+    outputContainer.append(group1)
+
+    iterNum.style.height = group2.offsetHeight + 'px'
 }
 
 function visualize() {
@@ -54,10 +84,10 @@ function visualize() {
     const iterationCount = Number(iterationsInput.value)
     for (let i = 0; i < iterationCount; i++) {
         const newGuess = (guess + target / guess) / 2
+        addRow(i + 1, target, guess, newGuess)
         if (newGuess === guess) {
             return
         }
-        createRow(i + 1, target, guess, newGuess)
         guess = newGuess
     }
 }
